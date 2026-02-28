@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amigo Dialer — Smart, Fast &amp; Secure Dialer App</title>
+    <meta
+      name="description"
+      content="Amigo Dialer is a modern Android dialer with call logs, spam detection, clean UI, and customization."
+    />
+    <style>
+      /* ── Reset & Base ─────────────────────────────── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --clr-bg: #f5f7fa;
+        --clr-surface: #ffffff;
+        --clr-text: #1a1a2e;
+        --clr-muted: #555e6e;
+        --clr-primary: #4361ee;
+        --clr-accent: #7209b7;
+        --clr-gradient: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+        --clr-border: rgba(0, 0, 0, 0.06);
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.12);
+        --radius: 16px;
+        --max-w: 960px;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --clr-bg: #0f0f1a;
+          --clr-surface: #1a1a2e;
+          --clr-text: #e8e8f0;
+          --clr-muted: #a0a4b8;
+          --clr-border: rgba(255, 255, 255, 0.06);
+          --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+          --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+          --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+        }
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family:
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          Roboto,
+          "Helvetica Neue",
+          Arial,
+          sans-serif;
+        line-height: 1.65;
+        color: var(--clr-text);
+        background: var(--clr-bg);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── Utilities ────────────────────────────────── */
+      .container {
+        max-width: var(--max-w);
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      .section {
+        padding: 72px 0;
+      }
+      .section:nth-child(even) {
+        background: var(--clr-surface);
+      }
+      .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        letter-spacing: -0.02em;
+      }
+      .section-subtitle {
+        color: var(--clr-muted);
+        font-size: 1.05rem;
+        margin-bottom: 36px;
+      }
+      .gradient-text {
+        background: var(--clr-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* ── Navbar ────────────────────────────────────── */
+      .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--clr-surface);
+        border-bottom: 1px solid var(--clr-border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        background: rgba(255, 255, 255, 0.85);
+      }
+      @media (prefers-color-scheme: dark) {
+        .navbar {
+          background: rgba(26, 26, 46, 0.85);
+        }
+      }
+      .navbar .container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 60px;
+        
+      }
+      .nav-brand {
+        font-weight: 700;
+        font-size: 1.15rem;
+        text-decoration: none;
+        color: var(--clr-text);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .nav-brand .icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--clr-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 800;
+        font-size: 1rem;
+      }
+      .nav-links {
+        display: flex;
+        gap: 28px;
+        list-style: none;
+      }
+      .nav-links a {
+        text-decoration: none;
+        color: var(--clr-muted);
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover {
+        color: var(--clr-primary);
+      }
+
+      /* Mobile toggle */
+      .nav-toggle {
+        display: none;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 6px;
+      }
+      .nav-toggle span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        margin: 5px 0;
+        background: var(--clr-text);
+        transition: 0.2s;
+      }
+      @media (max-width: 640px) {
+        .nav-toggle {
+          display: block;
+        }
+        .nav-links {
+          display: none;
+          flex-direction: column;
+          position: absolute;
+          top: 60px;
+          left: 0;
+          right: 0;
+          gap: 0;
+          background: var(--clr-surface);
+          border-bottom: 1px solid var(--clr-border);
+          box-shadow: var(--shadow-md);
+        }
+        .nav-links.open {
+          display: flex;
+        }
+        .nav-links a {
+          padding: 14px 24px;
+          border-top: 1px solid var(--clr-border);
+        }
+      }
+
+      /* ── Hero ──────────────────────────────────────── */
+      .hero {
+        padding: 100px 0 80px;
+        text-align: center;
+      }
+      .hero .app-icon {
+        width: 96px;
+        height: 96px;
+        border-radius: 24px;
+        background: var(--clr-gradient);
+        margin: 0 auto 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 32px rgba(67, 97, 238, 0.35);
+      }
+      .hero .app-icon svg {
+        width: 52px;
+        height: 52px;
+      }
+      .hero h1 {
+        font-size: clamp(2.2rem, 5vw, 3.4rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 14px;
+      }
+      .hero .tagline {
+        font-size: 1.2rem;
+        color: var(--clr-muted);
+        margin-bottom: 36px;
+      }
+      .hero .cta-group {
+        display: flex;
+        gap: 14px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 32px;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition:
+          transform 0.15s,
+          box-shadow 0.2s;
+        cursor: pointer;
+        border: none;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .btn-primary {
+        background: var(--clr-gradient);
+        color: #fff;
+        box-shadow: 0 4px 20px rgba(67, 97, 238, 0.35);
+      }
+      .btn-primary:hover {
+        box-shadow: 0 6px 28px rgba(67, 97, 238, 0.45);
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--clr-primary);
+        border: 2px solid var(--clr-primary);
+      }
+      .btn-outline:hover {
+        background: var(--clr-primary);
+        color: #fff;
+      }
+
+      /* ── About ─────────────────────────────────────── */
+      .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+        align-items: center;
+      }
+      @media (max-width: 700px) {
+        .about-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .about-visual {
+        aspect-ratio: 4/3;
+        border-radius: var(--radius);
+        background: var(--clr-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+      }
+      .about-visual::after {
+        content: "";
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 60%
+        );
+        top: -50%;
+        left: -50%;
+      }
+      .about-visual svg {
+        width: 80px;
+        height: 80px;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+      }
+      .about-text p {
+        color: var(--clr-muted);
+        margin-bottom: 16px;
+        font-size: 1.02rem;
+      }
+
+      /* ── Features ──────────────────────────────────── */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+        gap: 20px;
+      }
+      .feature-card {
+        background: var(--clr-surface);
+        border: 1px solid var(--clr-border);
+        border-radius: var(--radius);
+        padding: 28px 24px;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+      }
+      .feature-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--clr-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+      }
+      .feature-icon svg {
+        width: 22px;
+        height: 22px;
+      }
+      .feature-card h3 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .feature-card p {
+        font-size: 0.92rem;
+        color: var(--clr-muted);
+        line-height: 1.55;
+      }
+
+      /* ── Privacy ───────────────────────────────────── */
+      .privacy-content {
+        background: var(--clr-surface);
+        border: 1px solid var(--clr-border);
+        border-radius: var(--radius);
+        padding: 36px 32px;
+        box-shadow: var(--shadow-sm);
+      }
+      .privacy-content h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 24px 0 8px;
+      }
+      .privacy-content h3:first-child {
+        margin-top: 0;
+      }
+      .privacy-content p,
+      .privacy-content li {
+        color: var(--clr-muted);
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+      }
+      .privacy-content ul {
+        margin-left: 20px;
+        margin-bottom: 16px;
+      }
+      .privacy-content li {
+        margin-bottom: 6px;
+      }
+
+      /* ── Contact ───────────────────────────────────── */
+      .contact-box {
+        text-align: center;
+        max-width: 520px;
+        margin: 0 auto;
+      }
+      .contact-box p {
+        color: var(--clr-muted);
+        margin-bottom: 24px;
+        font-size: 1.02rem;
+      }
+      .email-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 28px;
+        border-radius: 50px;
+        background: var(--clr-surface);
+        border: 1px solid var(--clr-border);
+        box-shadow: var(--shadow-sm);
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--clr-primary);
+        text-decoration: none;
+        transition:
+          box-shadow 0.2s,
+          transform 0.15s;
+      }
+      .email-pill:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+      }
+      .email-pill svg {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+
+      /* ── Footer ────────────────────────────────────── */
+      .footer {
+        text-align: center;
+        padding: 32px 0;
+        border-top: 1px solid var(--clr-border);
+        color: var(--clr-muted);
+        font-size: 0.85rem;
+      }
+      .footer a {
+        color: var(--clr-primary);
+        text-decoration: none;
+      }
+      .footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── Navbar ──────────────────────────────────────── -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+      <div class="container">
+        <a href="#" class="nav-brand">
+          <span class="icon">A</span>
+          Amigo Dialer
+        </a>
+        <button
+          class="nav-toggle"
+          aria-label="Toggle menu"
+          onclick="
+            document.querySelector('.nav-links').classList.toggle('open')
+          "
+        >
+          <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-links">
+          <li><a href="#about">About</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#privacy">Privacy</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- ── Hero ────────────────────────────────────────── -->
+    <section class="hero">
+      <div class="container">
+        <div class="app-icon">
+          <!-- Phone icon -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="#fff"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+            />
+          </svg>
+        </div>
+        <h1><span class="gradient-text">Amigo Dialer</span></h1>
+        <p class="tagline">Smart, Fast &amp; Secure Dialer App</p>
+        <div class="cta-group">
+          <a
+            href="https://play.google.com/store/apps/details?id=com.amigo.dialer"
+            class="btn btn-primary"
+            target="_blank"
+            rel="noopener"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+            Get on Google Play
+          </a>
+          <a href="#features" class="btn btn-outline">Explore Features</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── About ───────────────────────────────────────── -->
+    <section class="section" id="about">
+      <div class="container">
+        <h2 class="section-title">
+          About <span class="gradient-text">Amigo Dialer</span>
+        </h2>
+        <p class="section-subtitle">
+          A next-generation phone experience for Android.
+        </p>
+        <div class="about-grid">
+          <div class="about-visual">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="#fff"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+              <line x1="12" y1="18" x2="12" y2="18.01" />
+            </svg>
+          </div>
+          <div class="about-text">
+            <p>
+              <strong>Amigo Dialer</strong> is a modern Android dialer app
+              designed to replace your stock phone app with a cleaner, faster,
+              and more powerful experience.
+            </p>
+            <p>
+              It features comprehensive call log management, intelligent spam
+              detection, a beautifully crafted user interface, and deep
+              customization options — all while keeping your data private and
+              secure.
+            </p>
+            <p>
+              Choose between a <strong>Classic</strong> theme with traditional
+              tabs or a sleek <strong>Google Dialer</strong>-inspired theme with
+              gesture navigation and a floating search bar. Both themes support
+              dynamic Material You colors.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Features ─────────────────────────────────────── -->
+    <section class="section" id="features">
+      <div class="container">
+        <h2 class="section-title">Features</h2>
+        <p class="section-subtitle">
+          Everything you need in a modern dialer — nothing you don't.
+        </p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="#fff"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"
+                />
+              </svg>
+            </div>
+            <h3>Smart Call Logs</h3>
+            <p>
+              Grouped and organized call history with filters for missed,
+              incoming, and outgoing calls. Quick actions right from the log.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="#fff"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+            <h3>Spam Detection</h3>
+            <p>
+              Identify and block spam callers automatically. Protect yourself
+              from unwanted calls with built-in spam intelligence.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="#fff"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+                />
+              </svg>
+            </div>
+            <h3>Customization</h3>
+            <p>
+              Multiple themes, color schemes, and layout options. Personalize
+              your dialer to match your style and workflow.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="#fff"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <h3>Contact Management</h3>
+            <p>
+              Browse, search, and manage contacts across all accounts.
+              Favourites, speed dial, and smart search built-in.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="#fff"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polygon
+                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                />
+              </svg>
+            </div>
+            <h3>Favourites &amp; Speed Dial</h3>
+            <p>
+              Pin your most-called contacts as favourites for instant access.
+              One-tap calling from the home screen.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="#fff"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <h3>Privacy First</h3>
+            <p>
+              No data leaves your device. All call logs, contacts, and
+              preferences are stored locally. Your privacy matters.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Privacy Policy ──────────────────────────────── -->
+    <section class="section" id="privacy">
+      <div class="container">
+        <h2 class="section-title">Privacy Policy</h2>
+        <p class="section-subtitle">Last updated: February 25, 2026</p>
+        <div class="privacy-content">
+          <h3>Introduction</h3>
+          <p>
+            Recline ("we", "our", or "the app") is a phone dialer application
+            developed by Sumant Mourya. This Privacy Policy explains how
+            information is used and protected when you use our app.
+          </p>
+          <p>
+            Recline processes most data locally on your device. Some limited
+            data may be collected by third-party services such as Google AdMob
+            and Firebase Crashlytics, as described below.
+          </p>
+
+          <h3>Fake Call Feature</h3>
+          <p>
+            The Fake Call feature allows you to simulate an incoming call for
+            personal use. Fake calls are generated locally on your device using
+            a foreground timer service. They do not contact real phone numbers,
+            emergency services, or external systems.
+          </p>
+          <p>
+            This feature is clearly labeled within the app and is intended for
+            entertainment or privacy purposes only.
+          </p>
+
+          <h3>Information We Collect</h3>
+          <p>
+            Recline operates primarily as an offline application. We do not
+            collect, transmit, or store your personal data on any external
+            servers.
+          </p>
+          <p>The app accesses the following data locally on your device:</p>
+          <ul>
+            <li>
+              <strong>Contacts</strong> – To display contact names, phone
+              numbers, and photos during calls and in the contact list
+            </li>
+            <li>
+              <strong>Call Logs</strong> – To show your recent call history and
+              allow editing or deleting call records
+            </li>
+            <li>
+              <strong>Phone State</strong> – To manage incoming and outgoing
+              calls and display caller information
+            </li>
+            <li>
+              <strong>SMS</strong> – To send auto-reply and quick reply messages
+              when those features are enabled by you
+            </li>
+            <li>
+              <strong>Photos / Media</strong> – To allow you to select custom
+              background images for the call screen
+            </li>
+          </ul>
+          <p>
+            None of this data is transmitted to our servers or to any third
+            party by the app itself.
+          </p>
+
+          <h3>Call Audio</h3>
+          <p>
+            Recline is a default phone replacement app that integrates with
+            Android's Telecom framework (<code>InCallService</code>). Call audio
+            — including your microphone — is managed entirely by the Android
+            system during phone calls.
+          </p>
+          <p>
+            Recline does <strong>not</strong> record, store, process, or
+            transmit any call audio. No audio is saved locally or shared with
+            any server or third party. The app only controls call UI, routing
+            (earpiece / speaker / Bluetooth), and mute state via system APIs.
+          </p>
+
+          <h3>Crash Reporting – Firebase Crashlytics</h3>
+          <p>
+            Recline uses <strong>Firebase Crashlytics</strong>, a crash
+            reporting service provided by Google, to help us identify and fix
+            stability issues.
+          </p>
+          <p>
+            Crashlytics may automatically collect the following information when
+            a crash or error occurs:
+          </p>
+          <ul>
+            <li>Crash stack traces and error logs</li>
+            <li>Device model, OS version, and app version</li>
+            <li>Anonymised device identifiers</li>
+            <li>App state at the time of the crash (diagnostics)</li>
+          </ul>
+          <p>
+            This data is used solely to diagnose and fix bugs. It is not linked
+            to your personal identity and is governed by Google's Privacy
+            Policy:
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener"
+              >https://policies.google.com/privacy</a
+            >
+          </p>
+
+          <h3>Advertising – Google AdMob</h3>
+          <p>
+            Recline uses <strong>Google AdMob</strong> to display native and
+            banner advertisements. Google AdMob may collect certain information
+            as described in Google's Privacy Policy, including:
+          </p>
+          <ul>
+            <li>Advertising ID</li>
+            <li>Device information (model, OS version)</li>
+            <li>IP address</li>
+            <li>Ad interaction data</li>
+          </ul>
+          <p>
+            This data collection is governed by Google's Privacy Policy:
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener"
+              >https://policies.google.com/privacy</a
+            >
+          </p>
+          <p>
+            We do not have access to or control over the data collected by
+            Google AdMob.
+          </p>
+
+          <h3>Ad Display Policy</h3>
+          <p>
+            Advertisements are <strong>never</strong> shown during active phone
+            calls, on incoming call screens, or over the lock screen.
+          </p>
+          <p>
+            Native ads appear briefly when you access certain features in app
+            settings, with a cooldown between displays. Banner ads appear in
+            select configuration screens. Ads are only shown when you actively
+            interact with features and can be closed at any time.
+          </p>
+
+          <h3>Permissions</h3>
+          <p>
+            Recline requests the following permissions, each used solely for the
+            stated purpose:
+          </p>
+          <ul>
+            <li>
+              <strong>Phone &amp; Call</strong> – Make, receive, and manage
+              phone calls as a default dialer
+            </li>
+            <li>
+              <strong>Contacts</strong> – Display caller and contact information
+            </li>
+            <li>
+              <strong>Call Log</strong> – Show, edit, and delete recent call
+              history
+            </li>
+            <li>
+              <strong>Notifications</strong> – Incoming call, missed call, and
+              ongoing call alerts
+            </li>
+            <li>
+              <strong>SMS (Send only)</strong> – Send auto-reply and quick reply
+              messages
+            </li>
+            <li>
+              <strong>Bluetooth</strong> – Route call audio to Bluetooth
+              headsets
+            </li>
+            <li>
+              <strong>Write Settings</strong> – Set a custom system ringtone
+              chosen by you
+            </li>
+            <li>
+              <strong>Storage / Media</strong> – Select custom background images
+              for the call screen
+            </li>
+            <li>
+              <strong>Internet</strong> – Load advertisements and send crash
+              reports
+            </li>
+            <li>
+              <strong>Foreground Service</strong> – Keep the call screen and
+              fake call timer active
+            </li>
+          </ul>
+
+          <h3>Data Storage</h3>
+          <p>
+            All settings and preferences are stored locally on your device using
+            Android SharedPreferences and internal app storage. This includes:
+          </p>
+          <ul>
+            <li>Call background images and preferences</li>
+            <li>Sleep control schedules and contact exceptions</li>
+            <li>Call blocking rules and auto-reply messages</li>
+            <li>Quick reply message templates</li>
+            <li>Theme and customisation preferences</li>
+            <li>Ad cooldown and display counters</li>
+          </ul>
+          <p>
+            You can clear all app data at any time via
+            <em>Settings → Apps → Recline → Clear Data</em>.
+          </p>
+
+          <h3>Data Sharing</h3>
+          <p>
+            We do not sell, rent, or trade your personal data. Data may be
+            shared only as follows:
+          </p>
+          <ul>
+            <li>
+              <strong>Google AdMob</strong> – Device and ad interaction data for
+              serving advertisements
+            </li>
+            <li>
+              <strong>Firebase Crashlytics</strong> – Anonymised crash and
+              diagnostic data for stability improvements
+            </li>
+          </ul>
+          <p>No other data is shared with any third party.</p>
+
+          <h3>Children's Privacy</h3>
+          <p>
+            Recline is not directed at children under the age of 13. We do not
+            knowingly collect personal information from children. If you are a
+            parent or guardian and believe your child has provided personal data
+            through a third-party SDK (such as AdMob or Crashlytics), please
+            contact us at the address below.
+          </p>
+
+          <h3>Security</h3>
+          <p>
+            We take reasonable measures to protect data stored on your device.
+            Since all app data remains local, security depends on your device's
+            system protections such as lock screen, encryption, and OS-level app
+            sandboxing.
+          </p>
+
+          <h3>Changes to This Policy</h3>
+          <p>
+            We may update this Privacy Policy from time to time. Any changes
+            will be reflected with an updated "Last updated" date at the top of
+            this page. Continued use of the app after any changes constitutes
+            acceptance of the updated policy.
+          </p>
+
+          <h3>Contact Us</h3>
+          <p>
+            If you have questions or concerns about this Privacy Policy, contact
+            us at
+            <a href="mailto:sumantkushwaha.dev@gmail.com"
+              >sumantkushwaha.dev@gmail.com</a
+            >.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Contact ─────────────────────────────────────── -->
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="contact-box">
+          <h2 class="section-title">Get in Touch</h2>
+          <p>
+            Have questions, feedback, or suggestions? We'd love to hear from
+            you.
+          </p>
+          <a href="mailto:sumantkushwaha.dev@gmail.com" class="email-pill">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+              />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            sumantkushwaha.dev@gmail.com
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Footer ──────────────────────────────────────── -->
+    <footer class="footer">
+      <div class="container">
+        <p>
+          &copy; 2026 Amigo Dialer. Developed by
+          <a href="mailto:sumantkushwaha.dev@gmail.com">Sumant Kushwaha</a>. All
+          rights reserved.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
